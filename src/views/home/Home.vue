@@ -1,0 +1,329 @@
+<template>
+  <div class="home-container">
+    <!-- 标题栏 -->
+    <el-header class="header">
+      <div class="header-left">
+        <el-icon class="menu-icon" @click="toggleSidebar">
+          <Menu />
+        </el-icon>
+        <div class="title-container">
+          <i class="iconfont icon-haitunyouxi logo-icon"></i>
+          <span class="title">海豚外卖</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <el-dropdown>
+          <span class="user-info">
+            <el-avatar :size="32" :icon="UserFilled" class="user-avatar" />
+            <span class="username">管理员</span>
+          </span>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="handleMenuClick('/home/user/myinfo')">个人信息</el-dropdown-item>
+              <el-dropdown-item>注销账号</el-dropdown-item>
+              <el-dropdown-item @click="handleMenuClick('/home/user/updpasword')">修改密码</el-dropdown-item>
+              <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </el-header>
+
+    <div class="main-container">
+      <!-- 侧边栏 -->
+      <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
+        <el-menu unique-opened :default-active="activeMenu" class="el-menu-vertical" :collapse="isCollapse"
+          background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
+          <el-menu-item index="/home/dashboard" @click="handleMenuClick('/')">
+            <el-icon>
+              <House />
+            </el-icon>
+            <template #title>首页</template>
+          </el-menu-item>
+
+          <el-sub-menu index="/home/user" :open="opentMenu">
+            <template #title>
+              <el-icon>
+                <User />
+              </el-icon>
+              <span>用户管理</span></template>
+
+            <el-menu-item index="/home/user/userList" @click="handleMenuClick('/home/user/userList')">
+              <el-icon>
+                <List />
+              </el-icon>
+              <template #title>用户列表</template>
+            </el-menu-item>
+            <el-menu-item index="/home/user/myinfo" @click="handleMenuClick('/home/user/myinfo')">
+              <el-icon>
+                <List />
+              </el-icon>
+              <template #title>个人信息</template>
+            </el-menu-item>
+
+            <el-menu-item index="/home/user/updpasword" @click="handleMenuClick('/home/user/updpasword')">
+              <el-icon>
+                <Edit />
+
+              </el-icon>
+              <template #title>修改密码</template>
+            </el-menu-item>
+          </el-sub-menu>
+
+
+          <el-sub-menu index="/home/goods" :open="opentMenu">
+            <template #title>
+              <el-icon>
+                <Goods />
+              </el-icon>
+              <span>商品管理</span>
+            </template>
+            <el-menu-item index="/home/goods/category" @click="handleMenuClick('/home/goods/category')">
+              <el-icon>
+                <List />
+              </el-icon>
+              <template #title>商品分类</template>
+            </el-menu-item>
+            <el-menu-item index="/home/goods/goodslist" @click="handleMenuClick('/home/goods/goodslist')">
+              <el-icon>
+                <Goods />
+              </el-icon>
+              <template #title>商品列表</template>
+            </el-menu-item>
+            <el-menu-item index="/home/goods/add" @click="handleMenuClick('/home/goods/add')">
+              <el-icon>
+                <Plus />
+              </el-icon>
+              <template #title>添加商品</template>
+            </el-menu-item>
+          </el-sub-menu>
+          <el-menu-item index="/home/order/orderlist" @click="handleMenuClick('/home/order/orderlist')">
+            <el-icon>
+              <ShoppingCart />
+            </el-icon>
+            <template #title>订单管理</template>
+          </el-menu-item>
+          <el-menu-item index="/home/storeInfo" @click="handleMenuClick('/home/storeInfo')">
+            <el-icon>
+              <Shop />
+            </el-icon>
+            <template #title>店铺设置</template>
+          </el-menu-item>
+          <el-sub-menu index="/home/article" :open="opentMenu">
+            <template #title>
+              <el-icon>
+                <Notebook />
+              </el-icon>
+              <span>文章管理</span>
+            </template>
+
+            <el-menu-item index="/home/article/articlelist" @click="handleMenuClick('/home/article/articlelist')">
+              <el-icon>
+                <Notebook />
+              </el-icon>
+              <template #title>文章列表</template>
+            </el-menu-item>
+
+            <el-menu-item index="/home/article/articleClassify"
+              @click="handleMenuClick('/home/article/articleClassify')">
+              <el-icon>
+                <Notebook />
+              </el-icon>
+              <template #title>文章分类</template>
+            </el-menu-item>
+            <el-menu-item index="/home/article/addArticle" @click="handleMenuClick('/home/article/addArticle')">
+              <el-icon>
+                <Plus />
+              </el-icon>
+              <template #title>添加文章</template>
+            </el-menu-item>
+
+          </el-sub-menu>
+
+          <el-sub-menu index="/home/chars" :open="opentMenu">
+            <template #title>
+              <el-icon>
+                <HelpFilled />
+              </el-icon>
+              <span>报表统计</span>
+            </template>
+            <el-menu-item index="/home/chars/orderchar" @click="handleMenuClick('/home/chars/orderchar')">
+              <el-icon>
+                <HelpFilled />
+              </el-icon>
+              <template #title>订单统计</template>
+            </el-menu-item>
+            <el-menu-item index="/home/chars/goodschar" @click="handleMenuClick('/home/chars/goodschar')">
+              <el-icon>
+                <HelpFilled />
+              </el-icon>
+              <template #title>商品统计</template>
+            </el-menu-item>
+          </el-sub-menu>
+
+
+
+
+        </el-menu>
+      </el-aside>
+
+      <!-- 主内容区 -->
+      <el-main class="main">
+        <router-view></router-view>
+      </el-main>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus'
+import {
+  Menu,
+  UserFilled,
+  House,
+  Goods,
+  ShoppingCart,
+  User,
+  Shop,
+  HelpFilled,
+  Notebook,
+  List,
+  Plus,
+  Edit
+} from '@element-plus/icons-vue'
+const router = useRouter();
+const route = useRoute();
+const isCollapse = ref(false)
+
+//判断当前路由
+
+const opentMenu = ref(false);
+const toggleSidebar = () => {
+  isCollapse.value = !isCollapse.value
+}
+
+// 动态计算当前激活菜单
+const activeMenu = computed(() => {
+  return route.path;
+});
+console.log(route);
+
+const handleMenuClick = (path) => {
+  // if (route.path.includes(path)) {
+  //   opentMenu.value = true;
+  //   console.log(1);
+  // }
+  router.push(path);
+  console.log(path);
+
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  router.push('/login')
+  ElMessage.success('已退出登录')
+}
+</script>
+
+<style scoped>
+.home-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background-color: #fff;
+  border-bottom: 1px solid #e6e6e6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-icon {
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 20px;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 24px;
+  color: #fff;
+  background-color: #409EFF;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.username {
+  margin-left: 10px;
+  color: #333;
+}
+
+.main-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.aside {
+  background-color: #304156;
+  transition: width 0.3s;
+}
+
+.el-menu-vertical {
+  border-right: none;
+}
+
+.el-menu-vertical:not(.el-menu--collapse) {
+  width: 200px;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f0f2f5;
+  overflow-y: auto;
+}
+
+.user-avatar {
+  background-color: #409EFF;
+  color: #fff;
+}
+</style>
