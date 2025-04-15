@@ -27,6 +27,7 @@
                         <el-icon>
                             <Plus />
                         </el-icon>
+
                         <el-dialog v-model="dialogVisible">
                             <img w-full :src="dialogImageUrl" alt="Preview Image" width="100%" />
                         </el-dialog>
@@ -73,7 +74,7 @@
                 <el-form-item label="店铺图片">
                     <div class="image-list">
                         <el-image v-for="(pic, index) in form.pics" :key="index"
-                            style="width: 120px; height: 120px; margin-right: 10px;" :src="pic"
+                            style="width: 120px; height: 120px; margin-right: 10px;" :src="'http://8.137.157.16:9002'+pic"
                             :preview-src-list="form.pics" fit="cover" />
                     </div>
                 </el-form-item>
@@ -96,6 +97,7 @@ import { getShopInfo,uploadShopImage, editShop } from '@/api/shop' // 修改为�
 import { useRoute } from 'vue-router'
 import { Plus } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
+import { log } from 'echarts/types/src/util/log.js'
 // import OrderForm from './OrderForm.vue' // 注意：这里需要创建一个对应的ShopForm组件
 const isEdit = ref(false);
 const loading = ref(false)
@@ -128,11 +130,7 @@ const form = reactive({
     description: '',
     score: 0,
     sellCount: 0,
-    supports: [
-        "单人精彩套餐",
-        "VC无限橙果汁全场8折",
-        "在线支付满28减5"
-    ],
+    supports: [],
     pics: [
         "1589589155004.jpg",
         "1589589160189.jpg"
@@ -162,6 +160,8 @@ const handleFileChange = async (file: UploadFile) => {
             console.log(form.avatar);
             
             dialogImageUrl.value = form.avatar
+            console.log(dialogImageUrl.value);
+            
             ElMessage.success('图片上传成功')
         }
     } catch (error) {
@@ -191,7 +191,10 @@ const handleGetShopInfo = async () => {
             form.score = response.data.data.score;
             form.sellCount = response.data.data.sellCount;
             form.minPrice = response.data.data.minPrice;
-            console.log(form);
+            form.supports = response.data.data.supports;
+            form.date  = response.data.data.date;
+            form.pics=response.data.data.pics;
+            console.log(form.date);
 
             ElMessage.success('获取店铺详情成功')
         } else {
@@ -212,23 +215,33 @@ handleGetShopInfo()
 const handleUpdate = () => {
     isEdit.value = true
 }
+
 const handleSuess = async () => {
     isEdit.value = false;
     console.log(form.avatar);
+    const slicedPics = form.pics.map(item => item.slice(13));
+    console.log(slicedPics);
     
     const data={
         id:form.id,
         name:form.name,
         bulletin:form.bulletin,
-        avatar:form.avatar,
+        avatar:form.avatar.slice(13),
         deliveryPrice:form.deliveryPrice,
         deliveryTime:form.deliveryTime,
         description:form.description,
         score:form.score,
         sellCount:form.sellCount,
-        minPrice:form.minPrice
+        // minPrice:form.minPrice,
+        supports:JSON.stringify(form.supports),
+        date:JSON.stringify(form.date),
+        pics:JSON.stringify(slicedPics)
     }
+    console.log(data);
+    
     const response = await editShop(data);
+    console.log(response);
+    
     if (response.status === 200) {
         ElMessage.success('编辑店铺信息成功')
         handleGetShopInfo()
