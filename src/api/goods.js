@@ -1,4 +1,4 @@
-import request from './axios'
+import request from '../utils/axios'
 
 // 添加分类
 export function addCategory(data) {

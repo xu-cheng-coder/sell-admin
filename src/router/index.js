@@ -5,7 +5,6 @@ import Register from '../views/Register.vue'
 import Dashboard from '../views/home/child/dash/Dashboard.vue'
 import UserIndex from '../views/home/child/user/index.vue'
 import UserList from '../views/home/child/user/child/UserList.vue'
-import UserDetail from '../views/home/child/user/child/UserDetail.vue'
 import Goods from '../views/home/child/goos/Goods.vue'
 import GoodsList from '../views/home/child/goos/child/GoodsList.vue'
 import AddGood from '../views/home/child/goos/child/AddGood.vue'
@@ -47,14 +46,13 @@ const routes = [
         component: UserIndex,
         children: [
           {
+            path: '',
+            redirect: '/home/user/userList'
+          },
+          {
             path: 'userList',
             name: 'UserList',
             component: UserList
-          },
-          {
-            path: 'detail/:id',
-            name: 'UserDetail',
-            component: UserDetail
           },
           {
             path: 'myinfo',
@@ -72,6 +70,10 @@ const routes = [
         path: 'goods',
         component: Goods,
         children: [
+          {
+            path: '',
+            redirect: '/home/goods/goodslist',
+          },
           {
             path: 'goodslist',
             name: 'GoodsList',
@@ -93,6 +95,10 @@ const routes = [
         component: Orders,
         children: [
           {
+            path: '',
+            redirect: '/home/order/orderlist',
+          },
+          {
             path: 'orderlist',
             name: 'OrderList',
             component: OrderList
@@ -109,6 +115,10 @@ const routes = [
         path: 'article',
         component: Article,
         children: [
+          {
+            path: '',
+            redirect: '/home/article/articlelist',
+          },
           {
             path: 'articlelist',
             name: 'ArticleList',
@@ -139,9 +149,14 @@ const routes = [
       {
         path: 'storeInfo',
         component: StoreInfo
-      }, {
+      }, 
+      {
         path: 'chars',
         children: [
+          {
+            path: '',
+            redirect: '/home/chars/orderchar',
+          },
           {
             path: 'orderchar',
             name: 'Orderchar',

@@ -53,8 +53,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
-import { login } from '../api/axios'
-
+import { login } from '../api/login.js'
 const router = useRouter()
 const loginFormRef = ref(null)
 const loading = ref(false)
@@ -86,6 +85,8 @@ const handleLogin = async () => {
           password: loginForm.password
         })
 
+        console.log(res.data);
+        
         if (res.data.code === 0) {
           // 登录成功
           localStorage.setItem('token', res.data.token)

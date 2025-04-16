@@ -48,7 +48,16 @@ const states = ref([
         value: 0
     }
 ])
-
+// 重置表单方法
+const resetForm = () => {
+    form.value = {
+        cateName: '',
+        state: ''
+    };
+    if (formRef.value) {
+        formRef.value.resetFields();
+    }
+};
 //提交s
 const handleSubmit = async () => {
     if (!formRef.value) {
@@ -70,6 +79,7 @@ const handleSubmit = async () => {
 
         if (response.data.code === 0) {
             ElMessage.success('添加成功')
+            resetForm();
 
             emit('submit')
         }
@@ -83,6 +93,8 @@ const handleSubmit = async () => {
 // 取消
 const handleCancel = () => {
     emit('cancel')
+    resetForm();
+
 }
 
 </script>

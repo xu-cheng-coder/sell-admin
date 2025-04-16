@@ -1,4 +1,4 @@
-import request from './axios'
+import request from '../utils/axios'
 
 // 登录接口
 export function login(data) {

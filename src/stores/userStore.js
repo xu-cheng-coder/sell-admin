@@ -7,7 +7,9 @@ import {defineStore} from 'pinia'
 export const useHeader = defineStore('header',{
     //状态
     state:()=>({
-        header:'zx'  
+        useInfo:{
+
+        }
     }),
      //行为： 修改状态方法 的  定义
     actions:{

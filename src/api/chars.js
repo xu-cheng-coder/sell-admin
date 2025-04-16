@@ -1,4 +1,4 @@
-import request from './axios';
+import request from '../utils/axios';
 
 // 首页报表接口（特殊功能echarts）
 export function getHomeReport() {

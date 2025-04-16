@@ -1,4 +1,4 @@
-import request from './axios'
+import request from '../utils/axios'
 
 // 文章分类获取
 export function getArticleTypeList(params) {

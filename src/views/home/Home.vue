@@ -11,16 +11,24 @@
           <span class="title">海豚外卖</span>
         </div>
       </div>
+
+      <el-breadcrumb class="breadcrumb-container" separator="/">
+        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>数据</el-breadcrumb-item>
+
+      </el-breadcrumb>
+
       <div class="header-right">
         <el-dropdown>
           <span class="user-info">
-            <el-avatar :size="32" :icon="UserFilled" class="user-avatar" />
-            <span class="username">管理员</span>
+            <!-- <el-avatar :size="40" :src="serviceUrl + userInfo.imgUrl" class="user-avatar" /> -->
+            <el-avatar :src="serviceUrl + userInfo.imgUrl" />
+            <span class="username">{{ userInfo.account }}</span>
           </span>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="handleMenuClick('/home/user/myinfo')">个人信息</el-dropdown-item>
-              <el-dropdown-item>注销账号</el-dropdown-item>
+              <el-dropdown-item @click="handleDeletMy">注销账号</el-dropdown-item>
               <el-dropdown-item @click="handleMenuClick('/home/user/updpasword')">修改密码</el-dropdown-item>
               <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
@@ -160,10 +168,6 @@
               <template #title>商品统计</template>
             </el-menu-item>
           </el-sub-menu>
-
-
-
-
         </el-menu>
       </el-aside>
 
@@ -176,12 +180,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { getAccountInfo } from '@/api/user'
+import serviceUrl from '../../utils/component.js';
+import { deleteUser } from '@/api/user'
 import {
   Menu,
-  UserFilled,
   House,
   Goods,
   ShoppingCart,
@@ -197,13 +203,53 @@ const router = useRouter();
 const route = useRoute();
 const isCollapse = ref(false)
 
+const userInfo = ref({});
 //判断当前路由
 
 const opentMenu = ref(false);
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value
 }
+//注销账号
+const handleDeletMy = () => {
+  ElMessageBox.confirm(
+    '确定要注销吗?',
+    '提示',
+    {
+      confirmButtonText: 'OK',
+      cancelButtonText: 'Cancel',
+      type: 'warning',
+    }
+  )
+    .then(() => {
+      ElMessage({
+        message: '注销成功',
+        type: 'success',
+      })
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
 
+      handleDle();
+    })
+    .catch(() => {
+      ElMessage({
+        type: 'info',
+        message: '成功取消',
+      })
+    })
+
+}
+//注销
+const userId = localStorage.getItem('userId');
+const handleDle = async () => {
+  console.log(Number(userId));
+
+  const res = await deleteUser(Number(userId));
+  console.log(res);
+  if (res.status === 200) {
+    router.push('/login')
+  }
+}
 // 动态计算当前激活菜单
 const activeMenu = computed(() => {
   return route.path;
@@ -218,8 +264,22 @@ const handleMenuClick = (path) => {
   router.push(path);
   console.log(path);
 
-}
+};
+//获取当前用户信息
+const getUserInfo = async () => {
+  const userId = localStorage.getItem('userId');
+  console.log(userId);
 
+  const res = await getAccountInfo(userId);
+
+  if (res.status == 200) {
+    Object.assign(userInfo.value, res.data.accountInfo);
+  }
+}
+//初始化
+onMounted(() => {
+  getUserInfo();
+})
 const handleLogout = () => {
   localStorage.removeItem('token')
   router.push('/login')
@@ -242,6 +302,11 @@ const handleLogout = () => {
   align-items: center;
   padding: 0 20px;
   height: 60px;
+}
+
+.breadcrumb-container {
+  flex: 1;
+  margin-left: 50px;
 }
 
 .header-left {
@@ -323,7 +388,6 @@ const handleLogout = () => {
 }
 
 .user-avatar {
-  background-color: #409EFF;
-  color: #fff;
+  overflow: hidden;
 }
 </style>

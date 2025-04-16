@@ -5,6 +5,8 @@
         <div class="card-header">
           <span>用户列表</span>
           <el-button type="primary" @click="handleAdd">添加用户</el-button>
+
+
         </div>
       </template>
 
@@ -18,45 +20,35 @@
             </el-icon>
           </template>
         </el-input>
-        <el-select v-model="userStatus" placeholder="用户状态" class="select-state" clearable>
-          <el-option label="正常" value="1" />
-          <el-option label="禁用" value="0" />
-        </el-select>
         <el-button type="primary" @click="handleSearch">搜索</el-button>
-        <el-button @click="resetSearch">重置</el-button>
+        <el-button type="danger" plain @click="deletAll">批量删除</el-button>
+        <el-button plain type="primary" @click="toggleSelection()">取消选择</el-button>
+
       </div>
 
       <!-- 用户表格 -->
-      <el-table :data="userList" style="width: 100%" v-loading="loading" border>
-        <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="username" label="用户名" width="120" />
-        <el-table-column prop="nickname" label="昵称" width="120" />
-        <el-table-column prop="phone" label="手机号" width="120" />
-        <el-table-column prop="email" label="邮箱" width="180" />
-        <el-table-column prop="role" label="角色" width="100">
+      <el-table :data="userList" style="width: 100%" v-loading="loading" 
+       row-key="id"
+       @selection-change="handleSelectionChange" 
+       ref="multipleTableRef"
+       border>
+       <el-table-column type="selection" :selectable="selectable" width="80" />
+
+        <el-table-column prop="id" label="ID" width="150" />
+
+        <el-table-column prop="account" label="用户名" width="150" />
+        <el-table-column prop="userGroup" label="角色" width="230" />
+   
+        <el-table-column prop="ctime" label="注册时间" width="230" >
           <template #default="{ row }">
-            <el-tag :type="row.role === 'admin' ? 'danger' : 'primary'">
-              {{ row.role === 'admin' ? '管理员' : '普通用户' }}
-            </el-tag>
+            <span>{{ row.ctime.slice(0, 10) }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+
+        <el-table-column label="操作" width="280" fixed="right">
           <template #default="{ row }">
-            <el-tag :type="row.status === '1' ? 'success' : 'danger'">
-              {{ row.status === '1' ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="注册时间" width="180" />
-        <el-table-column label="操作" width="250" fixed="right">
-          <template #default="{ row }">
-            <el-button type="primary" link @click="handleView(row)">查看</el-button>
             <el-button type="primary" link @click="handleEdit(row)">编辑</el-button>
-            <el-button type="primary" link @click="handleResetPwd(row)">重置密码</el-button>
-            <el-button type="primary" link :type="row.status === '1' ? 'danger' : 'success'"
-              @click="handleToggleStatus(row)">
-              {{ row.status === '1' ? '禁用' : '启用' }}
-            </el-button>
+            <el-button type="danger" link @click="handleDle(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -71,25 +63,30 @@
 
     <!-- 用户表单弹窗 -->
     <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑用户' : '添加用户'" width="500px" :close-on-click-modal="false">
-      <user-form ref="userFormRef" :is-edit="isEdit" :user-id="currentUserId" @submit="handleFormSubmit"
+      <user-form ref="userFormRef" :is-edit="isEdit" :accountId="currentUserId" :accountInfor="userInfo" @submit="handleFormSubmit"
         @cancel="dialogVisible = false" />
     </el-dialog>
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox ,TableInstance} from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import UserForm from './component/UserForm.vue'
-import { getUserList } from '@/api/user'
+import { getUserList,deleteUser,batchDeleteUsers } from '@/api/user'
+
 const router = useRouter()
 const userFormRef = ref(null)
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const currentUserId = ref(null)
-
+const userInfo = ref({
+  account: '',
+  userGroup: '',
+  id: 0
+});
 // 搜索相关
 const searchQuery = ref('')
 const userStatus = ref('')
@@ -100,7 +97,7 @@ const userList = ref([])
 
 // 分页相关
 const currentPage = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(7)
 const total = ref(100)
 
 // 搜索方法
@@ -135,12 +132,7 @@ onMounted(() => {
   getAllUser(currentPage.value,pageSize.value)
 })
 
-// 重置搜索
-const resetSearch = () => {
-  searchQuery.value = ''
-  userStatus.value = ''
-  handleSearch()
-}
+
 
 // 分页方法
 const handleSizeChange = (val) => {
@@ -153,10 +145,7 @@ const handleCurrentChange = (val) => {
   handleSearch()
 }
 
-// 查看用户详情
-const handleView = (row) => {
-  router.push(`/home/user/detail/${row.id}`)
-}
+
 
 // 添加用户
 const handleAdd = () => {
@@ -170,40 +159,11 @@ const handleEdit = (row) => {
   isEdit.value = true
   currentUserId.value = row.id
   dialogVisible.value = true
+  userInfo.value = row;
+  console.log(currentUserId.value);
+  
 }
 
-// 重置密码
-const handleResetPwd = (row) => {
-  ElMessageBox.confirm(
-    '确定要重置该用户的密码吗？',
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    // TODO: 实现重置密码逻辑
-    ElMessage.success('密码重置成功')
-  })
-}
-
-// 切换用户状态
-const handleToggleStatus = (row) => {
-  const action = row.status === '1' ? '禁用' : '启用'
-  ElMessageBox.confirm(
-    `确定要${action}该用户吗？`,
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }
-  ).then(() => {
-    // TODO: 实现状态切换逻辑
-    ElMessage.success(`${action}成功`)
-  })
-}
 
 // 处理表单提交
 const handleFormSubmit = () => {
@@ -211,6 +171,63 @@ const handleFormSubmit = () => {
   handleSearch() // 刷新列表
 }
 
+
+//多选
+const multipleTableRef = ref<TableInstance>()
+const multipleSelection = ref<User[]>([])
+const ids=ref([]) 
+const selectable = (row: User) => ![1, 2].includes(row.id)
+const toggleSelection = (rows?: User[], ignoreSelectable?: boolean) => {
+  if (rows) {
+    rows.forEach((row) => {
+      multipleTableRef.value!.toggleRowSelection(
+        row,
+        undefined,
+        ignoreSelectable
+      )
+    })
+  } else {
+    multipleTableRef.value!.clearSelection()
+  }
+}
+const handleSelectionChange = (val: User[]) => {
+  multipleSelection.value = val;
+  console.log(multipleSelection.value);
+  multipleSelection.value.forEach(item=>{
+    ids.value.push(item.id);
+  })
+  console.log(ids.value);
+  
+}
+//批量删除
+const deletAll = async () => {
+  console.log(ids.value.length);
+  
+  if(ids.value.length==0){
+    ElMessage.error('请勾选删除用户');
+    return
+  }
+  console.log(JSON.stringify(ids.value));
+  
+  const res = await batchDeleteUsers(ids.value);
+ 
+  if(res.status === 200){
+    ElMessage.success('删除成功');
+    handleSearch();
+  }
+}
+
+
+//删除
+const handleDle = async (row) => {
+    const res = await deleteUser(row.id);
+    console.log(res);
+    if(res.status === 200){
+      ElMessage.success('删除成功');
+      handleSearch();
+      
+    }
+}
 </script>
 
 <style scoped>

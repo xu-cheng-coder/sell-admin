@@ -89,7 +89,7 @@ const handlePictureCardPreview = (file: UploadFile) => {
 
 // 表单相关
 const formRef = ref(null)
-const loading = ref(false)
+const loading = ref(false);
 const emit = defineEmits(['submit', 'cancel'])
 
 // 表单数据
