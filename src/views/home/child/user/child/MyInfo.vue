@@ -167,7 +167,7 @@ const handleFileChange = async (file: UploadFile) => {
       console.log(form.value.avatar);
 
       dialogImageUrl.value = form.avatar
-
+      
       handleEditAvatar();
     }
   } catch (error) {
@@ -179,11 +179,14 @@ const handleFileChange = async (file: UploadFile) => {
 }
 //修改用户头像
 const handleEditAvatar = async () => {
-  console.log(form.value.avatar, form.value.id);
-  const response = await editAvatar({
+  const data={
     id: form.value.id,
     imgUrl: form.value.avatar,
-  });
+  }
+  console.log(data);
+  
+  const response = await editAvatar(data)
+    
   console.log(response);
   if (response.status === 200) {
     ElMessage.success('图片上传成功')

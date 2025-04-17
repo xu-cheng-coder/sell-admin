@@ -14,7 +14,7 @@ export const useHeader = defineStore('header',{
      //行为： 修改状态方法 的  定义
     actions:{
        changeMusic(newHeader){
-           this.header = newHeader;
+           this.useInfo = newHeader;
        }
     },
     //装饰器

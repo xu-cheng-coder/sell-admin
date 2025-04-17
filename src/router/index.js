@@ -23,6 +23,7 @@ import ArticleForm from '../views/home/child/article/child/ArticleForm.vue'
 import StoreInfo from '../views/home/child/store/child/StoreInfo.vue'
 import OrderChar from '../views/home/child/chars/child/OrderChar.vue'
 import GoodsChar from '../views/home/child/chars/child/GoodsChar.vue'
+
 const routes = [
   {
     path: '/',
@@ -31,19 +32,22 @@ const routes = [
   {
     path: '/home',
     component: Home,
+    meta: { breadcrumb: '首页' },
     children: [
       {
-        path:'',
-        redirect:'/home/dashboard'
+        path: '',
+        redirect: '/home/dashboard'
       },
       {
         path: 'dashboard',
         name: 'Dashboard',
-        component: Dashboard
+        component: Dashboard,
+        meta: { breadcrumb: '统计数据' }
       },
       {
         path: 'user',
         component: UserIndex,
+        meta: { breadcrumb: '用户管理' },
         children: [
           {
             path: '',
@@ -52,23 +56,27 @@ const routes = [
           {
             path: 'userList',
             name: 'UserList',
-            component: UserList
+            component: UserList,
+            meta: { breadcrumb: '用户列表' }
           },
           {
             path: 'myinfo',
             name: 'MyInfo',
-            component: MyInfo
+            component: MyInfo,
+            meta: { breadcrumb: '我的信息' }
           },
           {
             path: 'updpasword',
             name: 'UpdPassword',
-            component: UpdPassword
+            component: UpdPassword,
+            meta: { breadcrumb: '修改密码' }
           }
         ]
       },
       {
         path: 'goods',
         component: Goods,
+        meta: { breadcrumb: '商品管理' },
         children: [
           {
             path: '',
@@ -77,22 +85,27 @@ const routes = [
           {
             path: 'goodslist',
             name: 'GoodsList',
-            component: GoodsList
-          }, {
+            component: GoodsList,
+            meta: { breadcrumb: '商品列表' }
+          },
+          {
             path: 'category',
             name: 'category',
-            component: Category
+            component: Category,
+            meta: { breadcrumb: '商品分类' }
           },
           {
             path: 'add',
             name: 'add',
-            component: AddGood
+            component: AddGood,
+            meta: { breadcrumb: '添加商品' }
           }
         ]
       },
       {
         path: 'order',
         component: Orders,
+        meta: { breadcrumb: '订单管理' },
         children: [
           {
             path: '',
@@ -101,19 +114,21 @@ const routes = [
           {
             path: 'orderlist',
             name: 'OrderList',
-            component: OrderList
-          }
-          , {
+            component: OrderList,
+            meta: { breadcrumb: '订单列表' }
+          },
+          {
             path: 'orderdetail/:orderId',
-
             name: 'OrderDetail',
-            component: OrderDetail
+            component: OrderDetail,
+            meta: { breadcrumb: '订单详情' }
           }
         ]
       },
       {
         path: 'article',
         component: Article,
+        meta: { breadcrumb: '文章管理' },
         children: [
           {
             path: '',
@@ -122,36 +137,43 @@ const routes = [
           {
             path: 'articlelist',
             name: 'ArticleList',
-            component: ArticleList
+            component: ArticleList,
+            meta: { breadcrumb: '文章列表' }
           },
           {
             path: 'addArticle',
             name: 'AddArticle',
-            component: AddArticle
-          }
-          ,
+            component: AddArticle,
+            meta: { breadcrumb: '添加文章' }
+          },
           {
             path: 'articleDetail/:articleId',
             name: 'ArticleDetail',
-            component: ArticleDetail
+            component: ArticleDetail,
+            meta: { breadcrumb: '文章详情' }
           },
           {
             path: 'articleClassify',
             name: 'ArticleClassify',
-            component: ArticleClassify
-          }, {
+            component: ArticleClassify,
+            meta: { breadcrumb: '文章分类' }
+          },
+          {
             path: 'articleForm',
             name: 'ArticleForm',
-            component: ArticleForm
+            component: ArticleForm,
+            meta: { breadcrumb: '文章表单' }
           }
         ]
       },
       {
         path: 'storeInfo',
-        component: StoreInfo
-      }, 
+        component: StoreInfo,
+        meta: { breadcrumb: '店铺信息' }
+      },
       {
         path: 'chars',
+        meta: { breadcrumb: '统计图表' },
         children: [
           {
             path: '',
@@ -160,12 +182,14 @@ const routes = [
           {
             path: 'orderchar',
             name: 'Orderchar',
-            component: OrderChar
+            component: OrderChar,
+            meta: { breadcrumb: '订单图表' }
           },
           {
             path: 'goodschar',
             name: 'Goodschar',
-            component: GoodsChar
+            component: GoodsChar,
+            meta: { breadcrumb: '商品图表' }
           }
         ]
       }
@@ -174,20 +198,21 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: { breadcrumb: '登录' }
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register
+    component: Register,
+    meta: { breadcrumb: '注册' }
   }
 ]
+
 const router = createRouter({
   history: createWebHistory(),
   routes
 })
-
-
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
@@ -210,4 +235,5 @@ router.beforeEach((to, from, next) => {
 
   next()
 })
-export default router 
+
+export default router    

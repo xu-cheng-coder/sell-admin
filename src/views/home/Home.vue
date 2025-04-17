@@ -12,16 +12,16 @@
         </div>
       </div>
 
+      <!-- 面包屑 -->
       <el-breadcrumb class="breadcrumb-container" separator="/">
-        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item>数据</el-breadcrumb-item>
-
+        <el-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="index" :to="item.to">
+          {{ item.label }}
+        </el-breadcrumb-item>
       </el-breadcrumb>
 
       <div class="header-right">
         <el-dropdown>
           <span class="user-info">
-            <!-- <el-avatar :size="40" :src="serviceUrl + userInfo.imgUrl" class="user-avatar" /> -->
             <el-avatar :src="serviceUrl + userInfo.imgUrl" />
             <span class="username">{{ userInfo.account }}</span>
           </span>
@@ -40,134 +40,35 @@
     <div class="main-container">
       <!-- 侧边栏 -->
       <el-aside :width="isCollapse ? '64px' : '200px'" class="aside">
-        <el-menu unique-opened :default-active="activeMenu" class="el-menu-vertical" :collapse="isCollapse"
+        <el-menu router unique-opened :default-active="activeMenu" class="el-menu-vertical" :collapse="isCollapse"
           background-color="#304156" text-color="#bfcbd9" active-text-color="#409EFF">
-          <el-menu-item index="/home/dashboard" @click="handleMenuClick('/')">
-            <el-icon>
-              <House />
-            </el-icon>
-            <template #title>首页</template>
-          </el-menu-item>
+          <template v-for="item in menus">
+            <!-- 判断是否有子菜单 -->
+            <el-sub-menu v-if="item.children && item.children.length" :index="item.path" :key="item.path">
+              <template #title>
+                <el-icon>
+                  <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.title }}</span>
+              </template>
+              <el-menu-item v-for="child in item.children" :index="child.path" :key="child.path"
+                @click="handleMenuClick(child.path)">
+                <el-icon>
+                  <component :is="child.icon" />
+                </el-icon>
+                <span>{{ child.title }}</span>
+              </el-menu-item>
+            </el-sub-menu>
 
-          <el-sub-menu index="/home/user" :open="opentMenu">
-            <template #title>
-              <el-icon>
-                <User />
-              </el-icon>
-              <span>用户管理</span></template>
+            <!-- 判断是否没有子菜单 -->
 
-            <el-menu-item index="/home/user/userList" @click="handleMenuClick('/home/user/userList')">
+            <el-menu-item v-else :index="item.path" @click="handleMenuClick(item.path)">
               <el-icon>
-                <List />
+                <component :is="item.icon" />
               </el-icon>
-              <template #title>用户列表</template>
+              <span>{{ item.title }}</span>
             </el-menu-item>
-            <el-menu-item index="/home/user/myinfo" @click="handleMenuClick('/home/user/myinfo')">
-              <el-icon>
-                <List />
-              </el-icon>
-              <template #title>个人信息</template>
-            </el-menu-item>
-
-            <el-menu-item index="/home/user/updpasword" @click="handleMenuClick('/home/user/updpasword')">
-              <el-icon>
-                <Edit />
-
-              </el-icon>
-              <template #title>修改密码</template>
-            </el-menu-item>
-          </el-sub-menu>
-
-
-          <el-sub-menu index="/home/goods" :open="opentMenu">
-            <template #title>
-              <el-icon>
-                <Goods />
-              </el-icon>
-              <span>商品管理</span>
-            </template>
-            <el-menu-item index="/home/goods/category" @click="handleMenuClick('/home/goods/category')">
-              <el-icon>
-                <List />
-              </el-icon>
-              <template #title>商品分类</template>
-            </el-menu-item>
-            <el-menu-item index="/home/goods/goodslist" @click="handleMenuClick('/home/goods/goodslist')">
-              <el-icon>
-                <Goods />
-              </el-icon>
-              <template #title>商品列表</template>
-            </el-menu-item>
-            <el-menu-item index="/home/goods/add" @click="handleMenuClick('/home/goods/add')">
-              <el-icon>
-                <Plus />
-              </el-icon>
-              <template #title>添加商品</template>
-            </el-menu-item>
-          </el-sub-menu>
-          <el-menu-item index="/home/order/orderlist" @click="handleMenuClick('/home/order/orderlist')">
-            <el-icon>
-              <ShoppingCart />
-            </el-icon>
-            <template #title>订单管理</template>
-          </el-menu-item>
-          <el-menu-item index="/home/storeInfo" @click="handleMenuClick('/home/storeInfo')">
-            <el-icon>
-              <Shop />
-            </el-icon>
-            <template #title>店铺设置</template>
-          </el-menu-item>
-          <el-sub-menu index="/home/article" :open="opentMenu">
-            <template #title>
-              <el-icon>
-                <Notebook />
-              </el-icon>
-              <span>文章管理</span>
-            </template>
-
-            <el-menu-item index="/home/article/articlelist" @click="handleMenuClick('/home/article/articlelist')">
-              <el-icon>
-                <Notebook />
-              </el-icon>
-              <template #title>文章列表</template>
-            </el-menu-item>
-
-            <el-menu-item index="/home/article/articleClassify"
-              @click="handleMenuClick('/home/article/articleClassify')">
-              <el-icon>
-                <Notebook />
-              </el-icon>
-              <template #title>文章分类</template>
-            </el-menu-item>
-            <el-menu-item index="/home/article/addArticle" @click="handleMenuClick('/home/article/addArticle')">
-              <el-icon>
-                <Plus />
-              </el-icon>
-              <template #title>添加文章</template>
-            </el-menu-item>
-
-          </el-sub-menu>
-
-          <el-sub-menu index="/home/chars" :open="opentMenu">
-            <template #title>
-              <el-icon>
-                <HelpFilled />
-              </el-icon>
-              <span>报表统计</span>
-            </template>
-            <el-menu-item index="/home/chars/orderchar" @click="handleMenuClick('/home/chars/orderchar')">
-              <el-icon>
-                <HelpFilled />
-              </el-icon>
-              <template #title>订单统计</template>
-            </el-menu-item>
-            <el-menu-item index="/home/chars/goodschar" @click="handleMenuClick('/home/chars/goodschar')">
-              <el-icon>
-                <HelpFilled />
-              </el-icon>
-              <template #title>商品统计</template>
-            </el-menu-item>
-          </el-sub-menu>
+          </template>
         </el-menu>
       </el-aside>
 
@@ -180,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAccountInfo } from '@/api/user'
@@ -199,6 +100,8 @@ import {
   Plus,
   Edit
 } from '@element-plus/icons-vue'
+
+const breadcrumbItems = ref([]);
 const router = useRouter();
 const route = useRoute();
 const isCollapse = ref(false)
@@ -206,6 +109,107 @@ const isCollapse = ref(false)
 const userInfo = ref({});
 //判断当前路由
 
+// 菜单数据
+const menus = ref([
+  {
+    path: '/home/dashboard',
+    title: '首页',
+    icon: House
+  },
+  {
+    path: '/home/user',
+    title: '用户管理',
+    icon: User,
+    children: [
+      {
+        path: '/home/user/userList',
+        title: '用户列表',
+        icon: List
+      },
+      {
+        path: '/home/user/myinfo',
+        title: '个人信息',
+        icon: List
+      },
+      {
+        path: '/home/user/updpasword',
+        title: '修改密码',
+        icon: Edit
+      }
+    ]
+  },
+  {
+    path: '/home/goods',
+    title: '商品管理',
+    icon: Goods,
+    children: [
+      {
+        path: '/home/goods/category',
+        title: '商品分类',
+        icon: List
+      },
+      {
+        path: '/home/goods/goodslist',
+        title: '商品列表',
+        icon: Goods
+      },
+      {
+        path: '/home/goods/add',
+        title: '添加商品',
+        icon: Plus
+      }
+    ]
+  },
+  {
+    path: '/home/order/orderlist',
+    title: '订单管理',
+    icon: ShoppingCart
+  },
+  {
+    path: '/home/storeInfo',
+    title: '店铺设置',
+    icon: Shop
+  },
+  {
+    path: '/home/article',
+    title: '文章管理',
+    icon: Notebook,
+    children: [
+      {
+        path: '/home/article/articlelist',
+        title: '文章列表',
+        icon: Notebook
+      },
+      {
+        path: '/home/article/articleClassify',
+        title: '文章分类',
+        icon: Notebook
+      },
+      {
+        path: '/home/article/addArticle',
+        title: '添加文章',
+        icon: Plus
+      }
+    ]
+  },
+  {
+    path: '/home/chars',
+    title: '报表统计',
+    icon: HelpFilled,
+    children: [
+      {
+        path: '/home/chars/orderchar',
+        title: '订单统计',
+        icon: HelpFilled
+      },
+      {
+        path: '/home/chars/goodschar',
+        title: '商品统计',
+        icon: HelpFilled
+      }
+    ]
+  }
+]);
 const opentMenu = ref(false);
 const toggleSidebar = () => {
   isCollapse.value = !isCollapse.value
@@ -216,8 +220,8 @@ const handleDeletMy = () => {
     '确定要注销吗?',
     '提示',
     {
-      confirmButtonText: 'OK',
-      cancelButtonText: 'Cancel',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
       type: 'warning',
     }
   )
@@ -226,10 +230,10 @@ const handleDeletMy = () => {
         message: '注销成功',
         type: 'success',
       })
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
+
 
       handleDle();
+
     })
     .catch(() => {
       ElMessage({
@@ -242,11 +246,11 @@ const handleDeletMy = () => {
 //注销
 const userId = localStorage.getItem('userId');
 const handleDle = async () => {
-  console.log(Number(userId));
-
   const res = await deleteUser(Number(userId));
   console.log(res);
   if (res.status === 200) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     router.push('/login')
   }
 }
@@ -262,7 +266,6 @@ const handleMenuClick = (path) => {
   //   console.log(1);
   // }
   router.push(path);
-  console.log(path);
 
 };
 //获取当前用户信息
@@ -285,6 +288,32 @@ const handleLogout = () => {
   router.push('/login')
   ElMessage.success('已退出登录')
 }
+
+//面包屑
+
+
+const generateBreadcrumb = () => {
+  const items = [];
+  console.log(route.matched);
+
+  route.matched.forEach((matchedRoute) => {
+    if (matchedRoute.meta && matchedRoute.meta.breadcrumb) {
+      items.push({
+        label: matchedRoute.meta.breadcrumb,
+        to: { path: matchedRoute.path }
+      });
+    }
+  });
+  breadcrumbItems.value = items;
+  console.log(breadcrumbItems.value);
+
+};
+
+watch(() => route.path, () => {
+  generateBreadcrumb();
+});
+
+generateBreadcrumb();
 </script>
 
 <style scoped>
