@@ -100,6 +100,7 @@ import {
   Plus,
   Edit
 } from '@element-plus/icons-vue'
+import { markRaw } from 'vue';
 
 const breadcrumbItems = ref([]);
 const router = useRouter();
@@ -114,98 +115,98 @@ const menus = ref([
   {
     path: '/home/dashboard',
     title: '首页',
-    icon: House
+    icon: markRaw(House)
   },
   {
     path: '/home/user',
     title: '用户管理',
-    icon: User,
+    icon: markRaw(User),
     children: [
       {
         path: '/home/user/userList',
         title: '用户列表',
-        icon: List
+        icon: markRaw(List) 
       },
       {
         path: '/home/user/myinfo',
         title: '个人信息',
-        icon: List
+        icon: markRaw(List)
       },
       {
         path: '/home/user/updpasword',
         title: '修改密码',
-        icon: Edit
+        icon:  markRaw(Edit)
       }
     ]
   },
   {
     path: '/home/goods',
     title: '商品管理',
-    icon: Goods,
+    icon:   markRaw(Goods),
     children: [
       {
         path: '/home/goods/category',
         title: '商品分类',
-        icon: List
+        icon:  markRaw(List)
       },
       {
         path: '/home/goods/goodslist',
         title: '商品列表',
-        icon: Goods
+        icon:  markRaw(Goods)
       },
       {
         path: '/home/goods/add',
         title: '添加商品',
-        icon: Plus
+        icon:  markRaw(Plus)
       }
     ]
   },
   {
     path: '/home/order/orderlist',
     title: '订单管理',
-    icon: ShoppingCart
+    icon:  markRaw(ShoppingCart)
   },
   {
     path: '/home/storeInfo',
     title: '店铺设置',
-    icon: Shop
+    icon:  markRaw(Shop)
   },
   {
     path: '/home/article',
     title: '文章管理',
-    icon: Notebook,
+    icon:  markRaw(Notebook),
     children: [
       {
         path: '/home/article/articlelist',
         title: '文章列表',
-        icon: Notebook
+        icon:  markRaw(Notebook)
       },
       {
         path: '/home/article/articleClassify',
         title: '文章分类',
-        icon: Notebook
+        icon:  markRaw(Notebook)
       },
       {
         path: '/home/article/addArticle',
         title: '添加文章',
-        icon: Plus
+        icon:  markRaw(Plus)
       }
     ]
   },
   {
     path: '/home/chars',
     title: '报表统计',
-    icon: HelpFilled,
+    icon:  markRaw(HelpFilled),
     children: [
       {
         path: '/home/chars/orderchar',
         title: '订单统计',
-        icon: HelpFilled
+        icon:  markRaw(HelpFilled)
       },
       {
         path: '/home/chars/goodschar',
         title: '商品统计',
-        icon: HelpFilled
+        icon:  markRaw(HelpFilled)
       }
     ]
   }

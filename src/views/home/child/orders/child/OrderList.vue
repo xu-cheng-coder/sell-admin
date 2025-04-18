@@ -197,6 +197,7 @@ const getOrderLists = async () => {
 
     if (res.status == 200) {
         orderList.value = res.data.data;
+        total.value = res.data.total;
         console.log(orderList.value);
 
     }

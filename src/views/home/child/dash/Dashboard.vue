@@ -75,7 +75,7 @@
             </div>
           </template>
           <div class="card-content">
-            <div class="number">￥{{ optiondata.todayAmount }}</div>
+            <div class="number">￥{{ optiondata.totayAmount }}</div>
             <div class="trend down">
               <el-icon>
                 <ArrowDown />

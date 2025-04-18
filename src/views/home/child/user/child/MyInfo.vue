@@ -133,8 +133,10 @@ const handleSuccess = async () => {
     id: form.value.id,
     account: form.value.account,
     userGroup: form.value.userGroup
-  }
+    }
 
+  console.log(data);
+  
   const response = await editUser(data);
   console.log(response);
 
@@ -149,6 +151,7 @@ const handleCancel = () => {
   ElMessage.success('取消编辑')
   showimg.value = false;
 }
+
 // 文件上传处理
 const handleFileChange = async (file: UploadFile) => {
   currentFile.value = file.raw as File
@@ -156,9 +159,9 @@ const handleFileChange = async (file: UploadFile) => {
   loading.value = true
 
   try {
-    const formData = new FormData()
+    const formData = new FormData();
     formData.append('file', currentFile.value)
-
+  
     const res = await uploadAvatar(formData)
     if (res.data.code === 0) {
       console.log(res.data.imgUrl);
@@ -167,8 +170,8 @@ const handleFileChange = async (file: UploadFile) => {
       console.log(form.value.avatar);
 
       dialogImageUrl.value = form.avatar
-      
-      handleEditAvatar();
+
+      // handleEditAvatar();
     }
   } catch (error) {
     ElMessage.error('图片上传失败')
@@ -181,7 +184,7 @@ const handleFileChange = async (file: UploadFile) => {
 const handleEditAvatar = async () => {
   const data={
     id: form.value.id,
-    imgUrl: form.value.avatar,
+    imgUrl: serviceUrl+form.value.avatar,
   }
   console.log(data);
   
