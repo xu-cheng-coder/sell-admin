@@ -46,7 +46,7 @@
         </el-form>
 
         <!-- 订单列表 -->
-        <el-table v-loading="loading" :data="orderList" stripe style=" height: 400px;">
+        <el-table v-loading="loading" :data="orderList" stripe style=" height: 350px;">
             <el-table-column prop="id" label="订单id"></el-table-column>
             <el-table-column prop="orderNo" label="订单号"></el-table-column>
             <el-table-column prop="orderTime" width="100" label="下单时间">

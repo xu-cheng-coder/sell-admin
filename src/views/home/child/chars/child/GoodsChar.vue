@@ -12,7 +12,7 @@
                 <span>商品统计</span>
             </div>
         </template>
-        <div id="main" style="width: 100%; height: 494px;"></div>
+        <div ref="chart" style="width: 100%; height: 494px;"></div>
 
     </el-card>
 </template>
@@ -25,6 +25,7 @@ import { getOrderReport } from '@/api/chars';
 import { ElMessage } from 'element-plus'
 
 //获取报表信息
+const chart = ref(null);
 const optiondata = ref([])
 const getReport = async () => {
     const res = await getOrderReport(
@@ -43,7 +44,7 @@ const getReport = async () => {
 onMounted(() => {
     getReport();
     // 基于准备好的dom，初始化echarts实例
-    const myChart = echarts.init(document.getElementById('main'));
+    const myChart = echarts.init(chart.value);
     // 绘制图表
     const option = {
         tooltip: {

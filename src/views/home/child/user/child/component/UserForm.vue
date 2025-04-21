@@ -8,7 +8,7 @@
         <el-input placeholder="输入账号" v-model="form.account" />
       </el-form-item>
       <el-form-item v-if="!isEdit" label="密码" prop="password">
-        <el-input v-model="password" type="password" placeholder="输入密码" show-password />
+        <el-input v-model="form.password" type="password" placeholder="输入密码" show-password />
       </el-form-item>
       <el-form-item label="用户组" prop="userGroup">
         <el-select v-model="form.userGroup" placeholder="请选择" size="large" style="width: 240px">
@@ -29,7 +29,7 @@ import { ref, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
-import { editUser,addUser } from '@/api/user' // 假设这里有一个 editAccount 方法来调用 /users/edit 接口
+import { editUser, addUser } from '@/api/user' // 假设这里有一个 editAccount 方法来调用 /users/edit 接口
 
 // 在 script 顶部添加 loading 状态
 const loading = ref(false)
@@ -76,8 +76,8 @@ const form = reactive({
   account: '',
   userGroup: '',
   id: '',
+  password: '',
 })
-const password= ref('');
 // 表单验证规则
 const rules = {
   account: [
@@ -91,7 +91,9 @@ const rules = {
     { type: 'number', message: '账号ID必须为数字', trigger: 'blur' }
   ],
   password: [
-  { min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
+    { required: true, message: '请输入账号ID', trigger: 'blur' },
+
+    { required: true, min: 5, max: 20, message: '长度在 5 到 20 个字符', trigger: 'blur' }
   ]
 }
 
@@ -133,12 +135,12 @@ const handleSubmit = async () => {
       userGroup: form.userGroup
     }
     const requestData1 = {
-      password:password.value,
+      password: form.password,
       account: form.account,
       userGroup: form.userGroup
     }
 
-    console.log(requestData,requestData1);
+    console.log(requestData, requestData1);
 
     const response = props.isEdit
       ? await editUser(requestData)
@@ -149,7 +151,7 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     console.error('保存失败:', error)
-    ElMessage.error('请求失败，请稍后再试')
+    ElMessage.error('请输入正确的信息')
   } finally {
     loading.value = false // 关闭loading
   }

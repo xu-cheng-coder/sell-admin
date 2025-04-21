@@ -55,7 +55,7 @@ export function editUser(data) {
 }
 
 // 检查旧密码
-export function checkOldPassword(data) {
+export function checkOldpwd(data) {
   return request({
     url: '/users/checkoldpwd',
     method: 'get',
@@ -64,7 +64,7 @@ export function checkOldPassword(data) {
 }
 
 // 修改密码
-export function editPassword(data) {
+export function editpwd(data) {
   return request({
     url: '/users/editpwd',
     method: 'post',

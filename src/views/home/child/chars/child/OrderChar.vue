@@ -20,7 +20,7 @@
 
 <script setup>
 
-import { onMounted, ref } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import * as echarts from 'echarts';
 import { getOrderReport } from '@/api/chars';
 import { ElMessage } from 'element-plus'
@@ -92,6 +92,19 @@ onMounted(() => {
     };
     myChart.setOption(option);
 
+    //echarts 图 自适应 页面的宽高变化 
+    window.addEventListener('resize', () => {
+        console.log('高度发生改变');
+        myChart.resize();
+    })
+
+    //销毁前取消监听
+    onBeforeUnmount(() => {
+        window.removeEventListener('resize', () => {
+            console.log('高度发生改变');
+            myChart.resize();
+        })     
+    })
 });
 const shortcuts = [
     {
@@ -122,6 +135,7 @@ const shortcuts = [
         },
     },
 ]
+
 </script>
 
 <style scoped>

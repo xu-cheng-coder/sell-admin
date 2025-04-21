@@ -8,7 +8,7 @@
       </template>
       <el-form ref="ruleFormRef" :model="form" label-width="100px" :rules="rules" class="form-content">
         <el-form-item :required="true" label="旧密码" prop="password">
-          <el-input type="password" placeholder="请输入旧密码" show-password v-model="form.password" />
+          <el-input type="password"  @blur="checkOldPasswords" placeholder="请输入旧密码" show-password v-model="form.password" />
         </el-form-item>
         <el-form-item :required="true" label="新密码" prop="newPassword">
           <el-input type="password" placeholder="请输入新密码" show-password v-model="form.newPassword" />
@@ -30,9 +30,8 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
-import { editPassword, checkOldPassword } from '@/api/user'
-import { da } from 'element-plus/es/locales.mjs'
-
+import { editpwd, checkOldpwd } from '@/api/user'
+import { useRouter } from 'vue-router'
 const userId = localStorage.getItem('userId')
 const loading = ref(false)
 const form = ref({
@@ -41,7 +40,7 @@ const form = ref({
   confirmPassword: ''
 })
 const ruleFormRef = ref(null)
-
+const router = useRouter()
 //自定义密码校验规则
 const validatePass2 = (rule, value, callback) => {
   // rule是整个input的校验规则
@@ -104,7 +103,6 @@ const rules = reactive({
 const handleUpd = async () => {
   ruleFormRef.value.validate(async (valid) => {
     if (valid) {
-      checkOldPasswords();
       // if(result==false){
       //   ElMessage.error('旧密码错误')
       //   return
@@ -112,17 +110,22 @@ const handleUpd = async () => {
       const data = {
         id: Number(userId),
         newPwd: form.value.newPassword,
-
+        oldPwd: form.value.password
       }
       console.log(data);
 
-      const response = await editPassword(data);
+      const response = await editpwd(data);
       console.log(response);
 
-      if (response.status === 200) {
-        ElMessage.success('修改密码成功')
+      if (response.data.code === 0) {
+        ElMessage.success('修改密码成功，请重新登录')
+        localStorage.removeItem('userId')
+        localStorage.removeItem('token')
+        localStorage.removeItem('userRole')
+
+          router.push('/login');
       } else {
-        ElMessage.error('修改密码失败')
+        ElMessage.error('修改密码失败，密码错误')
       }
     }
 
@@ -138,13 +141,12 @@ const checkOldPasswords = async () => {
   }
   console.log(data);
 
-  const response = await checkOldPassword(data);
+  const response = await checkOldpwd(data);
   console.log(response);
 
-  if (response.status === 200) {
-    return true
-  } else {
-    return false
+  if (response.data.code !== 0) {
+      ElMessage.error('旧密码错误');
+      form.value.password = '';
   }
 }
 const handleCancel = () => {

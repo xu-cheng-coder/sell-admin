@@ -101,12 +101,14 @@ import {
   Edit
 } from '@element-plus/icons-vue'
 import { markRaw } from 'vue';
+import { userStore } from '../../stores/userStore'
+
 
 const breadcrumbItems = ref([]);
 const router = useRouter();
 const route = useRoute();
 const isCollapse = ref(false)
-
+const userstore = userStore();
 const userInfo = ref({});
 //判断当前路由
 
@@ -125,7 +127,7 @@ const menus = ref([
       {
         path: '/home/user/userList',
         title: '用户列表',
-        icon: markRaw(List) 
+        icon: markRaw(List)
       },
       {
         path: '/home/user/myinfo',
@@ -135,78 +137,78 @@ const menus = ref([
       {
         path: '/home/user/updpasword',
         title: '修改密码',
-        icon:  markRaw(Edit)
+        icon: markRaw(Edit)
       }
     ]
   },
   {
     path: '/home/goods',
     title: '商品管理',
-    icon:   markRaw(Goods),
+    icon: markRaw(Goods),
     children: [
       {
         path: '/home/goods/category',
         title: '商品分类',
-        icon:  markRaw(List)
+        icon: markRaw(List)
       },
       {
         path: '/home/goods/goodslist',
         title: '商品列表',
-        icon:  markRaw(Goods)
+        icon: markRaw(Goods)
       },
       {
         path: '/home/goods/add',
         title: '添加商品',
-        icon:  markRaw(Plus)
+        icon: markRaw(Plus)
       }
     ]
   },
   {
     path: '/home/order/orderlist',
     title: '订单管理',
-    icon:  markRaw(ShoppingCart)
+    icon: markRaw(ShoppingCart)
   },
   {
     path: '/home/storeInfo',
     title: '店铺设置',
-    icon:  markRaw(Shop)
+    icon: markRaw(Shop)
   },
   {
     path: '/home/article',
     title: '文章管理',
-    icon:  markRaw(Notebook),
+    icon: markRaw(Notebook),
     children: [
       {
         path: '/home/article/articlelist',
         title: '文章列表',
-        icon:  markRaw(Notebook)
+        icon: markRaw(Notebook)
       },
       {
         path: '/home/article/articleClassify',
         title: '文章分类',
-        icon:  markRaw(Notebook)
+        icon: markRaw(Notebook)
       },
       {
         path: '/home/article/addArticle',
         title: '添加文章',
-        icon:  markRaw(Plus)
+        icon: markRaw(Plus)
       }
     ]
   },
   {
     path: '/home/chars',
     title: '报表统计',
-    icon:  markRaw(HelpFilled),
+    icon: markRaw(HelpFilled),
     children: [
       {
         path: '/home/chars/orderchar',
         title: '订单统计',
-        icon:  markRaw(HelpFilled)
+        icon: markRaw(HelpFilled)
       },
       {
         path: '/home/chars/goodschar',
         title: '商品统计',
-        icon:  markRaw(HelpFilled)
+        icon: markRaw(HelpFilled)
       }
     ]
   }
@@ -311,10 +313,18 @@ const generateBreadcrumb = () => {
 };
 
 watch(() => route.path, () => {
+
   generateBreadcrumb();
 });
 
 generateBreadcrumb();
+
+//监听pinia的userstate是否变化，就重新刷新获取
+watch(() => { userstore.userInfoState }, () => {
+  console.log(userstore.userInfoState);
+  
+  getUserInfo();
+}, { deep: true })
 </script>
 
 <style scoped>

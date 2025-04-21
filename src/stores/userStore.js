@@ -4,17 +4,19 @@ import {defineStore} from 'pinia'
 
 //函数式编程 只要是函数 以 useXXX开头  
 //defineStore  参数1： 唯一的模块标记  不同的stores中的模块文件  不能重复 
-export const useHeader = defineStore('header',{
+export const userStore = defineStore('user',{
     //状态
     state:()=>({
         useInfo:{
 
-        }
+        },
+        userInfoState:true,
+
     }),
      //行为： 修改状态方法 的  定义
     actions:{
-       changeMusic(newHeader){
-           this.useInfo = newHeader;
+       changesstate(){
+           this.userInfoState = !this.userInfoState;
        }
     },
     //装饰器
