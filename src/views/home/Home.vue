@@ -18,7 +18,7 @@
 <script setup>
 import { ref } from 'vue'
 import Header from '@/views/home/component/header.vue'
-import Sidebar from '@/views/home/component/sidebar.vue'
+import Sidebar from '@/views/home/component/Sidebar.vue'
 
 const isCollapse = ref(false)
 
