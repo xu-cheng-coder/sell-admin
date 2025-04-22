@@ -83,7 +83,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import { getCategoryList, editCategory, deleteCategory } from '@/api/goods'
-import CateGoryForm from './CateGoryForm.vue'
+import CateGoryForm from '@/views/home/child/goos/child/CategoryForm.vue'
 const router = useRouter()
 const goodsFormRef = ref(null)
 const dialogVisible = ref(false)
@@ -123,22 +123,6 @@ const handleSearch = () => {
 //顶部搜索方法
 const handleTopSearch = async () => {
   loading.value = true
-
-  //搜索获取商品信息
-  // const res = await getGoodsList(
-  //     {
-  //         currentPage: current,
-  //         pageSize: pages,
-  //     }
-  // );
-  // if (res.status === 200) {
-  //     goodsList.value = res.data.data
-  //     console.log(goodsList.value);
-
-  //     total.value = res.data.total
-  // } else {
-  //     ElMessage.error(res.message)
-  // }
   setTimeout(() => {
     loading.value = false
   }, 500)
