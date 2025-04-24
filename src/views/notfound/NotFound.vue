@@ -32,11 +32,11 @@ const timer =setInterval(() => {
  })
 </script>
  
-<style lang='less' scoped>
+<style scoped>
  .notfound{
     width: 100%;
     height: 100%;
-    background: url('@/assets/imgs/404.png') no-repeat center center;
+    background: url('../../assets/img/404.png') no-repeat center center;
     background-size: 100%;
     display: flex;
     justify-content: center;
