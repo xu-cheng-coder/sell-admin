@@ -206,6 +206,13 @@ const routes = [
     name: 'Register',
     component: Register,
     meta: { breadcrumb: '注册' }
+  },
+  // 404路由
+  {
+    path: '/:pathMatch(.*)',
+    //    path: '/:catchAll(.*)',
+    name: 'NotFound',
+    component: ()=>{return import('@/views/notfound/NotFound.vue')}
   }
 ]
 
@@ -214,26 +221,18 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('token')
-  const authPages = ['/login', '/register']
 
-  // 如果要访问的是登录/注册页
-  if (authPages.includes(to.path)) {
-    // 如果已经登录，则重定向到首页
-    if (isAuthenticated) {
-      return next('/home/dashboard')
+
+//路由前置守卫
+router.beforeEach((go,from)=>{
+    const pathincludes = ['/login','/register']
+    if(pathincludes.includes(go.path)){
+      return true;
     }
-    return next()
-  }
-
-  // 对于其他所有路由
-  if (!isAuthenticated) {
-    return next('/login')
-  }
-
-  next()
+    if(localStorage.getItem('token')){
+      return true;
+    }else{
+      return '/login'
+    }
 })
-
 export default router    

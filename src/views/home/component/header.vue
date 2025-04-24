@@ -212,6 +212,7 @@
   .header-right {
     display: flex;
     align-items: center;
+  
   }
   
   .user-info {

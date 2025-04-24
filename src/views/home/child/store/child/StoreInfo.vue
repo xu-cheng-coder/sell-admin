@@ -21,14 +21,16 @@
                         :src="'http://8.137.157.16:9002/' + form.avatar" :preview-src-list="[form.avatar]"
                         fit="cover" />
 
-                    <el-upload v-if="isEdit" action="#" list-type="picture-card" :auto-upload="false"
-                        :on-change="handleFileChange" :on-preview="handlePictureCardPreview" :on-remove="handleRemove"
-                        :file-list="fileList">
-                        <el-icon>
-                            <Plus />
-                        </el-icon>
-
-                    </el-upload>
+                        <el-upload v-else="isEdit"
+                         class="avatar-uploader"
+                        :action="serviceUrl+'/shop/upload'"
+                       :show-file-list="false"
+                       :on-success="handleAvatarSuccess"
+                       :before-upload="beforeAvatarUpload"
+                           >
+                         <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                        <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+                       </el-upload>
 
 
                 </el-form-item>
@@ -74,32 +76,31 @@
                     </div>
                 </el-form-item>
                 <el-form-item label="店铺图片">
-                    <div class="image-list">
-                        <el-image v-for="(pic, index) in form.pics" :key="index"
-                            :src="'http://8.137.157.16:9002'+pic"
-                            style="width: 120px; height: 120px; margin-right: 10px;" :preview-src-list="form.pics"
-                            fit="cover" />
-                    </div>
 
-                    <el-upload action="#" v-if="isEdit" style="margin-top: 10px;" list-type="picture-card" :auto-upload="false" :on-change="handleFileChange1"
-                        :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :file-list="fileList">
-                        <el-icon>
-                            <Plus />
-                        </el-icon>
-                    
-                    </el-upload>
+                    <el-upload
+                    :disabled="!isEdit"
+                    v-model:file-list="fileList"
+                    :action="serviceUrl+'/shop/upload'"
+                    list-type="picture-card"
+                     :on-preview="handlePictureCardPreview"
+                     :on-remove="handleRemove"
+                     :on-success="handleImgSuccess"
+                         >
+                   <el-icon><Plus /></el-icon>
+                  </el-upload>
 
-
+ 
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" v-if="!isEdit" @click="handleUpdate">编辑信息</el-button>
                     <el-button type="success" v-if="isEdit" @click="handleSuess">完成</el-button>
                     <el-button type="default" v-if="isEdit" @click="handleCancel">取消</el-button>
-
                 </el-form-item>
             </el-form>
         </el-card>
-
+        <el-dialog v-model="dialogVisible">
+            <img w-full :src="dialogImageUrl" alt="Preview Image" />
+        </el-dialog>
     </div>
 </template>
 
@@ -110,12 +111,19 @@ import { getShopInfo, uploadShopImage, editShop } from '@/api/shop' // 修改为
 import { useRoute } from 'vue-router'
 import { Plus } from '@element-plus/icons-vue'
 import type { UploadProps, UploadUserFile } from 'element-plus'
+import serviceUrl from '../../../../../utils/component'
 // import OrderForm from './OrderForm.vue' // 注意：这里需要创建一个对应的ShopForm组件
 const isEdit = ref(false);
 const loading = ref(false)
 const route = useRoute()
-const fileList = ref<UploadFile[]>([])
-const currentFile = ref<File | null>(null)
+
+// 店铺多图
+const fileList = ref([])
+// 预览图片的弹窗
+const dialogVisible = ref(false)
+// 预览图片的路径
+const dialogImageUrl = ref('')
+
 const supports = ref([
     '单人精彩套餐',
     'VC无限橙果汁全场8折',
@@ -125,20 +133,51 @@ const supports = ref([
     '国庆特价',
     '春节1折折扣'
 ])
-//图片
-const dialogImageUrl = ref('')
-const dialogVisible = ref(false)
 
-const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-    console.log(uploadFile, uploadFiles)
+const imageUrl=ref('')
+
+//头像
+const handleAvatarSuccess = function (res, uploadFile) {
+    console.log(imageUrl.value);
+    
+    imageUrl.value = URL.createObjectURL(uploadFile.raw);
+    console.log(res);
+    
+    form.avatar=res.imgUrl;
+
+    ElMessage.success('图片上传成功');
+};
+
+const beforeAvatarUpload = function (file) {
+  console.log(file);
+    // 判断文件类型必须是 图片
+    if(!file.type.includes('image')){
+      ElMessage.error('文件类型必须是图片');
+      return false;
+    }
+    if(file.size >10*1024*1024){
+      ElMessage.error('文件大小不能超过 10M');
+      return false;
+    }
+  return true ;  
+};
+
+const handleImgSuccess=(ref,uploadFile)=>{
+    ElMessage.success('图片上传成功');
+    dialogImageUrl.value = URL.createObjectURL(uploadFile.raw);
+    form.pics.push(ref.imgUrl);
+    console.log(form.pics);
 }
-
-
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+  console.log(uploadFile, uploadFiles);
+  
+}
 
 const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
-    dialogImageUrl.value = uploadFile.url!
-    dialogVisible.value = true
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
 }
+
 // 表单数据
 const form = reactive({
     id: '',
@@ -162,57 +201,7 @@ const form = reactive({
     minPrice: ''
 })
 
-// 文件上传处理
-const handleFileChange = async (file: UploadFile) => {
-    currentFile.value = file.raw as File
-    fileList.value = [file]
-    loading.value = true
 
-    try {
-        const formData = new FormData()
-        formData.append('file', currentFile.value)
-
-        const res = await uploadShopImage(formData)
-        if (res.data.code === 0) {
-            console.log(res.data.imgUrl);
-
-            form.avatar = res.data.imgUrl.slice(13);
-            console.log(form.avatar);
-
-            dialogImageUrl.value = form.avatar
-            console.log(dialogImageUrl.value);
-            ElMessage.success('图片上传成功')
-        }
-    } catch (error) {
-        ElMessage.error('图片上传失败')
-        console.error('上传错误:', error)
-    } finally {
-        loading.value = false
-    }
-}
-const handleFileChange1 = async (file: UploadFile) => {
-    currentFile.value = file.raw as File
-    fileList.value = [file]
-    loading.value = true
-
-    try {
-        const formData = new FormData()
-        formData.append('file', currentFile.value)
-
-        const res = await uploadShopImage(formData)
-        if (res.data.code === 0) {
-            console.log(res.data.imgUrl);
-
-            form.pics.push(res.data.imgUrl);
-            console.log( form.pics);
-        }
-    } catch (error) {
-        ElMessage.error('图片上传失败')
-        console.error('上传错误:', error)
-    } finally {
-        loading.value = false
-    }
-}
 // 获取店铺数据
 const handleGetShopInfo = async () => {
     try {
@@ -236,7 +225,11 @@ const handleGetShopInfo = async () => {
             form.supports = response.data.data.supports;
             form.date = response.data.data.date;
             form.pics = response.data.data.pics;
-            console.log(form.date);
+                    
+            fileList.value = form.pics.map((item)=>{
+                return { name:item,url:serviceUrl+item} 
+             }) 
+            imageUrl.value = serviceUrl+ form.avatar;
 
             ElMessage.success('获取店铺详情成功')
         } else {
@@ -329,5 +322,31 @@ const handleCancel = () => {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+}
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
+:deep.avatar-uploader .el-upload {
+  border: 1px dashed #cecece;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: #3391de;
+}
+
+:deep.avatar-uploader .el-upload:hover {
+  border-color: #3391de;
+}
+
+:deep.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #c0c0c0;
+  width: 178px;
+  height: 178px;
+  text-align: center;
 }
 </style>
